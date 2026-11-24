@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>전략 스코어보드 V2</title>
+<style>
+  :root{font-family:"Malgun Gothic",system-ui,sans-serif;color:#1e303b;background:#f5f7f7;--ink:#1e303b;--sub:#526572;
+    --rule:#dee6e6;--paper:white;--accent:#006a59;--soft:#e8f4f0;--bad:#9a3339}
+  *{box-sizing:border-box} body{margin:0} main{max-width:1310px;margin:auto;padding:32px 28px 64px}
+  h1,h2,h3,h4,p,ul,dl{margin:0} h1{font-size:clamp(28px,5vw,44px);letter-spacing:-.07em}
+  h2{font-size:20px;letter-spacing:-.035em} h3{font-size:17px} h4{font-size:13px;color:var(--sub)}
+  a{color:var(--accent)} p,li{line-height:1.55} .muted,small{color:var(--sub)}
+  header{display:flex;align-items:flex-start;justify-content:space-between;gap:14px} header a{padding:10px 0;white-space:nowrap;font-size:13px}
+  header p{margin-top:8px;font-size:14px} .overview{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:20px 0}
+  .card,.panel,.entry-card{background:var(--paper);border:1px solid var(--rule);border-radius:12px;padding:14px}
+  .overview strong{display:block;font-size:21px;margin-top:3px}.overview small{font-size:12px}
+  nav{display:flex;flex-wrap:wrap;gap:5px;margin:15px 0;border-bottom:1px solid var(--rule)}
+  button,select{font:inherit;color:inherit;min-height:42px}
+  button:focus-visible,a:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+  nav button,.switch button{border:0;background:transparent;padding:7px 13px;cursor:pointer;color:var(--sub);border-radius:7px 7px 0 0}
+  button[aria-selected=true],button[aria-pressed=true]{color:var(--accent);font-weight:700;background:var(--soft)}
+  .switch{display:flex;gap:5px;flex-wrap:wrap}.switch button{border-radius:7px}
+  .toolbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin:8px 0 13px}
+  .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+  label{font-size:11px;color:var(--sub);display:grid;gap:4px;min-width:0}
+  select{font-size:13px;border:1px solid #c9d5d5;background:var(--paper);border-radius:7px;padding:4px 7px}
+  .grid{display:grid;grid-template-columns:minmax(0,1.8fr) minmax(280px,1fr);gap:13px;align-items:start}
+  .grid.single{grid-template-columns:1fr}.cards{display:grid;gap:8px}
+  .entry-card{padding:10px 12px}.entry-card.active{border-color:var(--accent)}
+  .entry-card button{background:none;border:0;text-align:left;cursor:pointer;color:var(--accent);font-weight:700;min-height:44px;padding:0}
+  .entry-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .entry-head strong{font-size:16px;white-space:nowrap}
+  .metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(80px,1fr));gap:10px;margin:10px 0 3px}
+  .metrics dt{font-size:11px;color:var(--sub)} .metrics dd{font-size:14px;margin:2px 0 0;font-variant-numeric:tabular-nums}
+  .panel>h2,.panel>h3,.panel>p{margin-bottom:8px}.pane{margin-top:12px} .note{font-size:13px;color:var(--sub)}
+  .line{padding:9px 0;border-top:1px solid var(--rule)} .bad{color:var(--bad)} .good{color:var(--accent)}
+  .gate{font-size:12px;white-space:nowrap;background:#f5efe9;border-radius:6px;padding:4px 7px;color:#734b25}
+  .tags{display:flex;gap:5px;flex-wrap:wrap;line-height:1.5;font-size:12px;color:var(--sub)}
+  .tags span{border:1px solid var(--rule);padding:3px 6px;border-radius:5px}
+  .table-scroll{max-width:100%;overflow:auto} table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{padding:9px 7px;border-bottom:1px solid var(--rule);text-align:left;vertical-align:top} th{font-size:11px;color:var(--sub)}
+  td.num{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+  .pagination{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 0}
+  .pagination button,.small-action{border:1px solid var(--rule);background:var(--paper);border-radius:7px;cursor:pointer;padding:0 12px}
+  .pagination button:disabled{color:#89969e;cursor:default}
+  details{padding:8px 0;border-top:1px solid var(--rule);font-size:13px} summary{cursor:pointer;min-height:32px}
+  .chart{width:100%;height:auto;display:block;margin:6px 0 2px;border:1px solid var(--rule);border-radius:7px}
+  .matrix-cell{padding:7px;margin:2px;min-height:35px;border:1px solid #bed6ce;background:var(--soft);border-radius:5px;cursor:pointer}
+  .section-list{list-style:none;padding:0;display:grid;gap:8px}
+  @media(max-width:800px){main{padding:18px 11px 48px}.overview{gap:6px}.overview strong{font-size:17px}.card{padding:9px}
+    nav button,.switch button{padding:6px 8px;min-height:44px;font-size:13px}.grid{grid-template-columns:1fr}
+    .filters{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.filters select{max-width:100%}
+    .metrics{grid-template-columns:repeat(3,minmax(0,1fr))}.toolbar{gap:5px} header p{font-size:12px}
+    #detail{scroll-margin-top:8px}.entry-card{padding:8px 10px}}
+</style>
+</head>
+<body>
+<main>
+  <header><div><h1>전략 스코어보드 V2</h1><p class="muted" id="subtitle"></p></div><a href="../">V1 지표 순위 ↗</a></header>
+  <div class="overview" id="overview"></div>
+  <nav aria-label="연구 화면" id="nav"></nav>
+  <section id="content" aria-live="polite"><p>연구 결과를 불러오는 중입니다.</p></section>
+</main>
+<script src="board.js" defer></script>
+</body></html>
